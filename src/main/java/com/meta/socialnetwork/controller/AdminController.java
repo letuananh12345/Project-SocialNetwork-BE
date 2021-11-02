@@ -11,6 +11,7 @@ import com.meta.socialnetwork.security.jwt.JwtProvider;
 import com.meta.socialnetwork.security.userPrinciple.UserPrinciple;
 import com.meta.socialnetwork.service.role.IRoleService;
 import com.meta.socialnetwork.service.user.IUserService;
+import com.meta.socialnetwork.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,15 +43,20 @@ public class AdminController {
     @Autowired
     JwtProvider jwtProvider;
 
+
     @PostMapping("/signin")
     public ResponseEntity<?> login(@Valid @RequestBody SignInForm signInForm){
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(signInForm.getUsername(), signInForm.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtProvider.createToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getFullName(), userPrinciple.getAvatarUrl(), userPrinciple.getAuthorities()));
+        if (userPrinciple.getIs_active()== false){
+            return new ResponseEntity<>(new ResponseMessage("user_was_blocked"), HttpStatus.OK);
+        }
+        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
     }
 
     @PostMapping("/signup")
@@ -69,6 +75,7 @@ public class AdminController {
         users.setDateOfBirth(signUpForm.getDateOfBirth());
         users.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
         users.setRe_password(passwordEncoder.encode(signUpForm.getRe_password()));
+        users.setIs_active(true);
         Set<String> strRole = signUpForm.getRoles();
         Set<Role> roles = new HashSet<>();
         strRole.forEach(role -> {
@@ -90,5 +97,15 @@ public class AdminController {
         users.setRoles(roles);
         userService.save(users);
         return new ResponseEntity<>(new ResponseMessage("create_success"), HttpStatus.OK);
+    }
+
+    @PutMapping("/block/{id}")
+    ResponseEntity<?> bock(@PathVariable Long id){
+        User user = userService.findById(id).get();
+
+            user.setIs_active(false);
+            userService.save(user);
+            return new ResponseEntity<>("blocked", HttpStatus.OK);
+
     }
 }

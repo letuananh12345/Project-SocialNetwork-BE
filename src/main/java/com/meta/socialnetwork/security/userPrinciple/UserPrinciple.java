@@ -22,9 +22,11 @@ public class UserPrinciple implements UserDetails {
     private String password;
     private String re_password;
     private String avatarUrl;
+    private Boolean is_active;
+
     private Collection<? extends GrantedAuthority> roles;
 
-    public UserPrinciple(Long id, String fullName, String username, String email, String password, String re_password, String avatarUrl
+    public UserPrinciple(Long id, String fullName, String username, String email, String password, String re_password, String avatarUrl, Boolean is_active
             , Collection<? extends GrantedAuthority> roles
     ) {
         this.id = id;
@@ -34,6 +36,7 @@ public class UserPrinciple implements UserDetails {
         this.password = password;
         this.password = re_password;
         this.avatarUrl = avatarUrl;
+        this.is_active = is_active;
         this.roles = roles;
     }
 
@@ -50,6 +53,7 @@ public class UserPrinciple implements UserDetails {
                 user.getPassword(),
                 user.getRe_password(),
                 user.getAvatarUrl(),
+                user.getIs_active(),
                 authorities
         );
     }
