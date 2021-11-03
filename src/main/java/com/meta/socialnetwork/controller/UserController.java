@@ -109,6 +109,23 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    //listlike
+    @GetMapping("/listlike")
+    public  ResponseEntity<?> getlistlike(){
+        List<Like> lists = (List<Like>) likeService.findAll();
+        int count = lists.size();
+        return new ResponseEntity<>(count, HttpStatus.OK);
+    }
+
+    //showlike theo post
+    @GetMapping("/listlike/{id}")
+    public  ResponseEntity<?> getlistlikePost(@PathVariable Long id){
+        List<Like> lists = (List<Like>) likeService.findAllLikeByPosts_Id(id);
+        int count = lists.size();
+        return new ResponseEntity<>(count, HttpStatus.OK);
+    }
+
+
     @PostMapping("/comment/{idPost}")
     public ResponseEntity<String> createComment(@RequestBody Comment comment, @PathVariable("idPost") Long idPost) {
         User user = userDetailService.getCurrentUser();

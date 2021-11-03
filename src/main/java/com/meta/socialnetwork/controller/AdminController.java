@@ -158,16 +158,13 @@ public class AdminController {
         String username = jwtProvider.getUsernameFromJwtToken(jwt);
         User user;
         try {
-            if(userService.existsByUsername(changeProfileForm.getUsername())){
-                return new ResponseEntity<>(new ResponseMessage("nouser"), HttpStatus.OK);
-            }
             if(userService.existsByEmail(changeProfileForm.getEmail())){
                 return new ResponseEntity<>(new ResponseMessage("noemail"), HttpStatus.OK);
             }
             user = userService.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User Not Found with -> useranme"+username));
-            user.setFullName(changeProfileForm.getName());
-            user.setUsername(changeProfileForm.getUsername());
+            user.setFullName(changeProfileForm.getFullName());
             user.setEmail(changeProfileForm.getEmail());
+            user.setPhone(changeProfileForm.getPhone());
             userService.save(user);
             return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
         } catch (UsernameNotFoundException exception){

@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ChangeProfileForm {
-    private String name;
-    private String username;
+    private String fullName;
     private String email;
+    private String phone;
 }

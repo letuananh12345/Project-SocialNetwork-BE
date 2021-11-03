@@ -11,4 +11,5 @@ public interface ILikeRepo extends JpaRepository<Like, Long> {
     void deleteAll(Iterable<? extends Like> likes);
 
     Like findByPostsIdAndUserId(Long idPost, Long idUser);
+
 }
