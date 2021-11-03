@@ -50,7 +50,7 @@ public class AdminController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtProvider.createToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getFullName(), userPrinciple.getAvatarUrl(), userPrinciple.getAuthorities()));
+        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
     }
 
     @PostMapping("/signup")
