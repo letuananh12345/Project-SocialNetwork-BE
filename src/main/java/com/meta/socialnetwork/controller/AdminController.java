@@ -1,9 +1,6 @@
 package com.meta.socialnetwork.controller;
 
-import com.meta.socialnetwork.dto.request.ChangeAvatar;
-import com.meta.socialnetwork.dto.request.ChangePasswordForm;
-import com.meta.socialnetwork.dto.request.SignInForm;
-import com.meta.socialnetwork.dto.request.SignUpForm;
+import com.meta.socialnetwork.dto.request.*;
 import com.meta.socialnetwork.dto.response.JwtResponse;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
 import com.meta.socialnetwork.model.Role;
@@ -152,6 +149,29 @@ public class AdminController {
             return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
         } catch (UsernameNotFoundException exception){
             return new ResponseEntity<>(new ResponseMessage(exception.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @PutMapping("/change-profile")
+    public ResponseEntity<?> changeProfile(HttpServletRequest request, @Valid @RequestBody ChangeProfileForm changeProfileForm){
+        String jwt = jwtAuthTokenFilter.getJwt(request);
+        String username = jwtProvider.getUsernameFromJwtToken(jwt);
+        User user;
+        try {
+            if(userService.existsByUsername(changeProfileForm.getUsername())){
+                return new ResponseEntity<>(new ResponseMessage("nouser"), HttpStatus.OK);
+            }
+            if(userService.existsByEmail(changeProfileForm.getEmail())){
+                return new ResponseEntity<>(new ResponseMessage("noemail"), HttpStatus.OK);
+            }
+            user = userService.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User Not Found with -> useranme"+username));
+            user.setFullName(changeProfileForm.getName());
+            user.setUsername(changeProfileForm.getUsername());
+            user.setEmail(changeProfileForm.getEmail());
+            userService.save(user);
+            return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
+        } catch (UsernameNotFoundException exception){
+            return new ResponseEntity<>(new ResponseMessage(exception.getMessage()),HttpStatus.NOT_FOUND );
         }
     }
 }

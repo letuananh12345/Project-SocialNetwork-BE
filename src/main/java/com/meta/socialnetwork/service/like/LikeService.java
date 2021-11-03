@@ -40,4 +40,9 @@ public class LikeService implements ILikeService{
     public void deleteAll(Iterable<? extends Like> likes) {
         likeRepo.deleteAll(likes);
     }
+
+    @Override
+    public Like findByPostsIdAndUserId(Long idPost, Long idUser) {
+        return likeRepo.findByPostsIdAndUserId(idPost, idUser);
+    }
 }

@@ -10,7 +10,6 @@ public class SignUpForm {
     private String fullName;
     private String username;
     private String password;
-    private String re_password;
     private String email;
     private String phone;
     private LocalDate dateOfBirth;

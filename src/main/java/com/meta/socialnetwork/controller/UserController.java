@@ -93,20 +93,25 @@ public class UserController {
     }
 
     // tạo like
-    @GetMapping("/likeshow/{idUser}/{idPost}")
-    public ResponseEntity<?> createlike(@PathVariable("idUser") Long idUser, @PathVariable("idPost") Long idPost) {
-        User user = userService.findById(idUser).get();
-        Post post = postService.findById(idPost).get();
-        Like like = new Like();
-        like.setUser(user);
-        like.setPosts(post);
-        likeService.save(like);
+    @GetMapping("/likeshow/{idPost}")
+    public ResponseEntity<?> createlike( @PathVariable("idPost") Long idPost) {
+        User user = userDetailService.getCurrentUser();
+        Like like = likeService.findByPostsIdAndUserId(idPost, user.getId());
+        if(like != null){
+            likeService.remove(like.getId());
+        } else {
+            Post post = postService.findById(idPost).get();
+            Like like1 = new Like();
+            like1.setUser(user);
+            like1.setPosts(post);
+            likeService.save(like1);
+        }
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping("/comment/{idUser}/{idPost}")
-    public ResponseEntity<String> createComment(@RequestBody Comment comment, @PathVariable("idUser") Long idUser, @PathVariable("idPost") Long idPost) {
-        User user = userService.findById(idUser).get();
+    @PostMapping("/comment/{idPost}")
+    public ResponseEntity<String> createComment(@RequestBody Comment comment, @PathVariable("idPost") Long idPost) {
+        User user = userDetailService.getCurrentUser();
         Post post = postService.findById(idPost).get();
         comment.setUser(user);
         comment.setPost(post);
