@@ -47,4 +47,14 @@ public class PostService implements IPostService{
     public List<Post> findPostsByStatus(Long id, String status, String status1) {
         return postRepo.findPostsByStatus(id, status, status1);
     }
+
+    @Override
+    public Iterable<Post> findAllByOrderByIdDesc() {
+        return postRepo.findAllByOrderByIdDesc();
+    }
+
+    @Override
+    public Iterable<Post> findByStatusOrderByIdDesc(String status) {
+        return postRepo.findByStatusOrderByIdDesc(status);
+    }
 }

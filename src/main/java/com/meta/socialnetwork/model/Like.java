@@ -17,5 +17,5 @@ public class Like {
     private User user;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    private  Post posts;
+    private Post posts;
 }

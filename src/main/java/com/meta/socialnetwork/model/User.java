@@ -17,13 +17,13 @@ public class User {
     private String fullName;
     private String username;
     private String password;
-    private String re_password;
     private String email;
     private String phone;
     private LocalDate dateOfBirth;
     private String avatarUrl;
     private String gender;
-    private Boolean is_active;
+    @Column(name = "is_active")
+    private Boolean isActive;
     private LocalDate created_date;
     private LocalDate modified_date;
 

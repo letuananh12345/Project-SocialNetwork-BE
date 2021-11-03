@@ -1,6 +1,7 @@
 package com.meta.socialnetwork.controller;
 
 import com.meta.socialnetwork.model.*;
+import com.meta.socialnetwork.security.userPrinciple.UserDetailServiceImpl;
 import com.meta.socialnetwork.security.userPrinciple.UserPrinciple;
 import com.meta.socialnetwork.service.comment.ICommentService;
 import com.meta.socialnetwork.service.friend.IFriendService;
@@ -33,50 +34,40 @@ public class UserController {
     IFriendService friendService;
     @Autowired
     PasswordEncoder passwordEncoder;
-
-    @PutMapping("/updatePassWord/{id}")
-    public  ResponseEntity<?> updatePassWord(@PathVariable Long id, @RequestBody User user){
-        User user1 = userService.findById(id).get();
-        user1.setPassword(passwordEncoder.encode(user.getPassword()));
-        userService.save(user1);
-        return new ResponseEntity<>(user1, HttpStatus.OK);
-    }
-
+    @Autowired
+    UserDetailServiceImpl userDetailService;
 
     @GetMapping("/showPost")
-    public ResponseEntity<?> getListPost(String aPublic) {
-//        String[] sortById = new String[2];
-//        Pageable pageable = PageRequest.of(Integer.parseInt(page), 5, Sort.by("id").descending());
-//        Page<Post> postPage = postService.findPostByPrivacyContaining("public", pageable);
-        Iterable<Post> postPage = postService.findAll();
+    public ResponseEntity<?> getListPost() {
+        Iterable<Post> postPage = postService.findAllByOrderByIdDesc();
         return new ResponseEntity<>(postPage, HttpStatus.OK);
     }
 
     // show post theo trạng thái
     @GetMapping("/showPostPublic")
     public ResponseEntity<?> getPostPublic(@RequestParam String status) {
-        List<Post> list = postService.findPostsByStatusIsContaining(status);
+        Iterable<Post> list = postService.findByStatusOrderByIdDesc(status);
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     //show post theo id_user
     @GetMapping("/showPostUser/{id}/{idPost}")
-    public ResponseEntity<?> showPostUser(@PathVariable Long id,@PathVariable Long idPost) {
+    public ResponseEntity<?> showPostUser(@PathVariable Long id, @PathVariable Long idPost) {
         User user = userService.findById(id).get();
         User user1 = userService.findById(idPost).get();
-        if (friendService.isFriend(user, user1, true, user1, user,true)) {
+        if (friendService.isFriend(user, user1, true, user1, user, true)) {
             List<Post> list = postService.findPostsByStatus(id, "public", "friend");
-            if (list!= null){
-                return  new ResponseEntity<>(list,HttpStatus.OK);
+            if (list != null) {
+                return new ResponseEntity<>(list, HttpStatus.OK);
             }
             return new ResponseEntity<>("no post", HttpStatus.OK);
-        }else return new ResponseEntity<>("no friend",HttpStatus.OK);
+        } else return new ResponseEntity<>("no friend", HttpStatus.OK);
     }
 
     // tạo bài post
-    @PostMapping("/createPost/{id}")
-    public ResponseEntity<?> createPost(@RequestBody Post post, @PathVariable Long id) {
-        User user = userService.findById(id).get();
+    @PostMapping("/createPost")
+    public ResponseEntity<?> createPost(@RequestBody Post post) {
+        User user = userDetailService.getCurrentUser();
         post.setUser(user);
         LocalDate localDate = LocalDate.now();
         post.setCreated_date(localDate);
@@ -101,6 +92,7 @@ public class UserController {
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
+    // tạo like
     @GetMapping("/likeshow/{idUser}/{idPost}")
     public ResponseEntity<?> createlike(@PathVariable("idUser") Long idUser, @PathVariable("idPost") Long idPost) {
         User user = userService.findById(idUser).get();
