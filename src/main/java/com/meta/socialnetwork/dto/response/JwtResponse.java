@@ -12,10 +12,16 @@ public class JwtResponse {
     private String type = "Bearer";
     private String fullName;
     private String avatarUrl;
+    private String message;
     private Collection<? extends GrantedAuthority> roles;
 
 
     public JwtResponse() {
+    }
+
+    public JwtResponse(String token, String message) {
+        this.token = token;
+        this.message = message;
     }
 
     public JwtResponse(String token, Long id, String avatarUrl, String fullName, Collection<? extends GrantedAuthority> authorities) {

@@ -3,15 +3,21 @@ package com.meta.socialnetwork.controller;
 import com.meta.socialnetwork.dto.request.*;
 import com.meta.socialnetwork.dto.response.JwtResponse;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
+import com.meta.socialnetwork.model.Post;
 import com.meta.socialnetwork.model.Role;
 import com.meta.socialnetwork.model.RoleName;
 import com.meta.socialnetwork.model.User;
 import com.meta.socialnetwork.security.jwt.JwtAuthTokenFilter;
 import com.meta.socialnetwork.security.jwt.JwtProvider;
 import com.meta.socialnetwork.security.userPrinciple.UserPrinciple;
+import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.role.IRoleService;
 import com.meta.socialnetwork.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +52,18 @@ public class AdminController {
     JwtProvider jwtProvider;
     @Autowired
     JwtAuthTokenFilter jwtAuthTokenFilter;
+    @Autowired
+    IPostService postService;
+
+    @GetMapping("/page-user")
+    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
+        Page<User> userPage = userService.findAll(pageable);
+        if(userPage.isEmpty()){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(userPage, HttpStatus.OK);
+    }
+
 
 
     @PostMapping("/signin")
@@ -57,7 +76,7 @@ public class AdminController {
         String token = jwtProvider.createToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
         if (userPrinciple.getIsActive()== false){
-            return new ResponseEntity<>(new ResponseMessage("user_was_blocked"), HttpStatus.OK);
+            return ResponseEntity.ok(new JwtResponse(token, "was_user_block")) ;
         }
         return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
     }
@@ -145,6 +164,13 @@ public class AdminController {
                 user = userService.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User Not Found -> username"+username));
                 user.setAvatarUrl(changeAvatar.getAvatarUrl());
                 userService.save(user);
+                Post post = new Post();
+                post.setUser(user);
+                post.setContent(user.getFullName() + " đã thay ảnh đại diện");
+                post.setImageUrl(changeAvatar.getAvatarUrl());
+                LocalDate localDate = LocalDate.now();
+                post.setCreated_date(localDate);
+                postService.save(post);
             }
             return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
         } catch (UsernameNotFoundException exception){
