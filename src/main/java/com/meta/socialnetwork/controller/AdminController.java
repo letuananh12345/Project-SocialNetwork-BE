@@ -65,7 +65,6 @@ public class AdminController {
     }
 
 
-
     @PostMapping("/signin")
     public ResponseEntity<?> login(@Valid @RequestBody SignInForm signInForm){
 
@@ -78,7 +77,8 @@ public class AdminController {
         if (userPrinciple.getIsActive()== false){
             return ResponseEntity.ok(new JwtResponse(token, "was_user_block")) ;
         }
-        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
+        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(),
+                userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
     }
 
     @PostMapping("/signup")
@@ -94,6 +94,7 @@ public class AdminController {
         users.setUsername(signUpForm.getUsername());
         users.setEmail(signUpForm.getEmail());
         users.setPhone(signUpForm.getPhone());
+        users.setAvatarUrl("https://vnn-imgs-a1.vgcloud.vn/image1.ictnews.vn/_Files/2020/03/17/trend-avatar-1.jpg");
         users.setDateOfBirth(signUpForm.getDateOfBirth());
         users.setPassword(passwordEncoder.encode(signUpForm.getPassword()));
         users.setIsActive(true);
@@ -123,10 +124,14 @@ public class AdminController {
     @PutMapping("/block/{id}")
     ResponseEntity<?> bock(@PathVariable Long id){
         User user = userService.findById(id).get();
-
-            user.setIsActive(false);
-            userService.save(user);
-            return new ResponseEntity<>("blocked", HttpStatus.OK);
+            if(user.getIsActive()) {
+                user.setIsActive(false);
+                userService.save(user);
+                return new ResponseEntity<>("blocked", HttpStatus.OK);
+            }
+                user.setIsActive(true);
+                userService.save(user);
+                return new ResponseEntity<>("unblock", HttpStatus.OK);
 
     }
 
@@ -168,6 +173,7 @@ public class AdminController {
                 post.setUser(user);
                 post.setContent(user.getFullName() + " đã thay ảnh đại diện");
                 post.setImageUrl(changeAvatar.getAvatarUrl());
+                post.setStatus("public");
                 LocalDate localDate = LocalDate.now();
                 post.setCreated_date(localDate);
                 postService.save(post);
