@@ -9,6 +9,10 @@ import com.meta.socialnetwork.service.like.ILikeService;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +22,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.domain.Sort.Direction.ASC;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -167,7 +173,7 @@ public class UserController {
             return new ResponseEntity<>("no user", HttpStatus.OK);
     }
 
-    // gửi yêu cầu kết bạn
+    // gửi yêu cầu kết bạn...
     @GetMapping("/sendaddfriend/{idAcc}/{idFriend}")
     public ResponseEntity<String> sendAddFriend(@PathVariable("idAcc") Long idUser, @PathVariable("idFriend") Long idFriend) {
         User user = userService.findById(idUser).get();
@@ -229,6 +235,12 @@ public class UserController {
         }
         return new ResponseEntity<>(accountList, HttpStatus.OK);
     }
-
-
+@GetMapping("/page-user")
+    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
+    Page<User> userPage = userService.findAll(pageable);
+    if(userPage.isEmpty()){
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    return new ResponseEntity<>(userPage, HttpStatus.OK);
+}
 }

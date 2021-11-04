@@ -3,12 +3,14 @@ package com.meta.socialnetwork.controller;
 import com.meta.socialnetwork.dto.request.*;
 import com.meta.socialnetwork.dto.response.JwtResponse;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
+import com.meta.socialnetwork.model.Post;
 import com.meta.socialnetwork.model.Role;
 import com.meta.socialnetwork.model.RoleName;
 import com.meta.socialnetwork.model.User;
 import com.meta.socialnetwork.security.jwt.JwtAuthTokenFilter;
 import com.meta.socialnetwork.security.jwt.JwtProvider;
 import com.meta.socialnetwork.security.userPrinciple.UserPrinciple;
+import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.role.IRoleService;
 import com.meta.socialnetwork.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,6 +48,8 @@ public class AdminController {
     JwtProvider jwtProvider;
     @Autowired
     JwtAuthTokenFilter jwtAuthTokenFilter;
+    @Autowired
+    IPostService postService;
 
 
     @PostMapping("/signin")
@@ -57,9 +62,10 @@ public class AdminController {
         String token = jwtProvider.createToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
         if (userPrinciple.getIsActive()== false){
-            return new ResponseEntity<>(new ResponseMessage("user_was_blocked"), HttpStatus.OK);
+            return new ResponseEntity<>(new JwtResponse("user_was_blocked", token), HttpStatus.OK);
         }
-        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
+
+        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getEmail(), userPrinciple.getPhone(), userPrinciple.getAuthorities()));
     }
 
     @PostMapping("/signup")
@@ -104,11 +110,9 @@ public class AdminController {
     @PutMapping("/block/{id}")
     ResponseEntity<?> bock(@PathVariable Long id){
         User user = userService.findById(id).get();
-
             user.setIsActive(false);
             userService.save(user);
             return new ResponseEntity<>("blocked", HttpStatus.OK);
-
     }
 
     @PutMapping("/change-password")
@@ -145,6 +149,13 @@ public class AdminController {
                 user = userService.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User Not Found -> username"+username));
                 user.setAvatarUrl(changeAvatar.getAvatarUrl());
                 userService.save(user);
+                Post post = new Post();
+                post.setUser(user);
+                post.setContent(user.getFullName() + " đã thay ảnh đại diện");
+                post.setImageUrl(changeAvatar.getAvatarUrl());
+                LocalDate localDate = LocalDate.now();
+                post.setCreated_date(localDate);
+                postService.save(post);
             }
             return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
         } catch (UsernameNotFoundException exception){

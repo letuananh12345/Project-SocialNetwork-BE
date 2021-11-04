@@ -3,6 +3,8 @@ package com.meta.socialnetwork.service.user;
 import com.meta.socialnetwork.model.User;
 import com.meta.socialnetwork.repository.IUserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -75,5 +77,10 @@ public class UserService implements IUserService {
     @Override
     public Iterable<User> findAllByUsernameIsContaining(String username) {
         return userRepository.findAllByUsernameIsContaining(username);
+    }
+
+    @Override
+    public Page<User> findAll(Pageable pageable) {
+        return userRepository.findAll(pageable);
     }
 }
