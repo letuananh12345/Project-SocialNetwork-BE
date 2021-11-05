@@ -54,7 +54,7 @@ public class AdminController {
     JwtAuthTokenFilter jwtAuthTokenFilter;
     @Autowired
     IPostService postService;
-<<<<<<< HEAD
+
 
     @GetMapping("/page-user")
     public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
@@ -64,8 +64,7 @@ public class AdminController {
         }
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
-=======
->>>>>>> namluty
+
 
 
     @PostMapping("/signin")
@@ -77,18 +76,12 @@ public class AdminController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtProvider.createToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
-<<<<<<< HEAD
-        if (userPrinciple.getIsActive()== false){
-            return ResponseEntity.ok(new JwtResponse(token, "was_user_block")) ;
-        }
-        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(),
-                userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
-=======
+
         if (userPrinciple.getIsActive() == false) {
             return new ResponseEntity<>(new ResponseMessage("user_was_blocked"), HttpStatus.OK);
         }
         return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getEmail(), userPrinciple.getPhone(), userPrinciple.getAuthorities()));
->>>>>>> namluty
+
     }
 
     @PostMapping("/signup")
@@ -134,7 +127,6 @@ public class AdminController {
     @PutMapping("/block/{id}")
     ResponseEntity<?> bock(@PathVariable Long id) {
         User user = userService.findById(id).get();
-<<<<<<< HEAD
             if(user.getIsActive()) {
                 user.setIsActive(false);
                 userService.save(user);
@@ -144,16 +136,6 @@ public class AdminController {
                 userService.save(user);
                 return new ResponseEntity<>("unblock", HttpStatus.OK);
 
-=======
-        if(user.getIsActive()) {
-            user.setIsActive(false);
-            userService.save(user);
-            return new ResponseEntity<>("blocked", HttpStatus.OK);
-        }
-        user.setIsActive(true);
-        userService.save(user);
-        return new ResponseEntity<>("unblock", HttpStatus.OK);
->>>>>>> namluty
     }
 
     @PutMapping("/change-password")
@@ -194,10 +176,7 @@ public class AdminController {
                 post.setUser(user);
                 post.setContent(user.getFullName() + " đã thay ảnh đại diện");
                 post.setImageUrl(changeAvatar.getAvatarUrl());
-<<<<<<< HEAD
                 post.setStatus("public");
-=======
->>>>>>> namluty
                 LocalDate localDate = LocalDate.now();
                 post.setCreated_date(localDate);
                 postService.save(post);

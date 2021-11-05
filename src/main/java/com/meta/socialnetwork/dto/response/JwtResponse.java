@@ -12,35 +12,30 @@ public class JwtResponse {
     private String type = "Bearer";
     private String fullName;
     private String avatarUrl;
-<<<<<<< HEAD
-    private String message;
-=======
     private String email;
     private String phone;
     private String message;
 
->>>>>>> namluty
+
     private Collection<? extends GrantedAuthority> roles;
 
 
     public JwtResponse() {
     }
 
-<<<<<<< HEAD
-    public JwtResponse(String token, String message) {
-        this.token = token;
-        this.message = message;
-    }
 
     public JwtResponse(String token, Long id, String avatarUrl, String fullName, Collection<? extends GrantedAuthority> authorities) {
-=======
+
+
+    }
+
     public JwtResponse(String message, String token) {
         this.message = message;
         this.token = token;
     }
 
     public JwtResponse(String token, Long id, String avatarUrl, String fullName, String email, String phone, Collection<? extends GrantedAuthority> authorities) {
->>>>>>> namluty
+
         this.token = token;
         this.id = id;
         this.fullName = fullName;

@@ -176,10 +176,6 @@ public class UserController {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend friend1 = friendService.findByUser_idAndFriend_id(user, friend);
-<<<<<<< HEAD
-//        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
-=======
->>>>>>> namluty
         if (friend1 == null ) {
             Friend newFriend = new Friend();
             newFriend.setUser(user);
@@ -196,21 +192,9 @@ public class UserController {
     public ResponseEntity<String> confirmFriend( @PathVariable("idFriend") Long idFriend) {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
-<<<<<<< HEAD
-//        Friend friend1 = friendService.findByUser_idAndFriend_id(user, friend);
-        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
-//        if (friend1 != null) {
-//            friend1.setStatus(true);
-//            friendService.save(friend1);
-//        } else {
-            friend2.setStatus(true);
-            friendService.save(friend2);
-//        }
-=======
         Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
             friend2.setStatus(true);
             friendService.save(friend2);
->>>>>>> namluty
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
     @GetMapping("/setFriend/{idFriend}")
