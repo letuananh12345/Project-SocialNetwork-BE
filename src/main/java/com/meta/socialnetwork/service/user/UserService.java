@@ -60,6 +60,11 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public Iterable<User> findByFullNameIsContaining(String fullName) {
+        return userRepository.findByFullNameIsContaining(fullName);
+    }
+
+    @Override
     public List<User> finAllByRoleName(String roleName) {
         List<User> user = new ArrayList<>();
         List<User> userList = (List<User>)findAll();

@@ -100,10 +100,10 @@ public class UserController {
 
     // tạo like
     @GetMapping("/likeshow/{idPost}")
-    public ResponseEntity<?> createlike( @PathVariable("idPost") Long idPost) {
+    public ResponseEntity<?> createlike(@PathVariable("idPost") Long idPost) {
         User user = userDetailService.getCurrentUser();
         Like like = likeService.findByPostsIdAndUserId(idPost, user.getId());
-        if(like != null){
+        if (like != null) {
             likeService.remove(like.getId());
         } else {
             Post post = postService.findById(idPost).get();
@@ -117,7 +117,7 @@ public class UserController {
 
     //listlike
     @GetMapping("/listlike")
-    public  ResponseEntity<?> getlistlike(){
+    public ResponseEntity<?> getlistlike() {
         List<Like> lists = (List<Like>) likeService.findAll();
         int count = lists.size();
         return new ResponseEntity<>(count, HttpStatus.OK);
@@ -125,13 +125,13 @@ public class UserController {
 
     //showlike theo post
     @GetMapping("/listlike/{id}")
-    public  ResponseEntity<?> getlistlikePost(@PathVariable Long id){
+    public ResponseEntity<?> getlistlikePost(@PathVariable Long id) {
         List<Like> lists = (List<Like>) likeService.findAllLikeByPosts_Id(id);
         int count = lists.size();
         return new ResponseEntity<>(count, HttpStatus.OK);
     }
 
-
+    // create comment
     @PostMapping("/comment/{idPost}")
     public ResponseEntity<String> createComment(@RequestBody Comment comment, @PathVariable("idPost") Long idPost) {
         User user = userDetailService.getCurrentUser();
@@ -164,23 +164,19 @@ public class UserController {
     }
 
     // tìm kiếm bạn theo tên
-    @GetMapping("findFriend")
-    public ResponseEntity<?> findFriend(@RequestBody User user) {
-        Iterable<User> user1 = userService.findAllByUsernameIsContaining(user.getUsername());
-        if (user1 != null) {
+    @GetMapping("findFriend/{username}")
+    public ResponseEntity<?> findFriend(@PathVariable String username) {
+        Iterable<User> user1 = userService.findAllByUsernameIsContaining(username);
             return new ResponseEntity<>(user1, HttpStatus.OK);
-        } else
-            return new ResponseEntity<>("no user", HttpStatus.OK);
     }
 
-    // gửi yêu cầu kết bạn...
-    @GetMapping("/sendaddfriend/{idAcc}/{idFriend}")
-    public ResponseEntity<String> sendAddFriend(@PathVariable("idAcc") Long idUser, @PathVariable("idFriend") Long idFriend) {
-        User user = userService.findById(idUser).get();
+    // gửi yêu cầu kết bạn
+    @GetMapping("/sendaddfriend/{idFriend}")
+    public ResponseEntity<String> sendAddFriend(@PathVariable("idFriend") Long idFriend) {
+        User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend friend1 = friendService.findByUser_idAndFriend_id(user, friend);
-        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
-        if (friend1 == null && friend2 == null) {
+        if (friend1 == null ) {
             Friend newFriend = new Friend();
             newFriend.setUser(user);
             newFriend.setFriend(friend);
@@ -192,26 +188,29 @@ public class UserController {
     }
 
     // chấp nhận kết bạn
-    @GetMapping("/confirmfriend/{idAcc}/{idFriend}")
-    public ResponseEntity<String> confirmFriend(@PathVariable("idAcc") Long idUser, @PathVariable("idFriend") Long idFriend) {
-        User account = userService.findById(idUser).get();
+    @GetMapping("/confirmfriend/{idFriend}")
+    public ResponseEntity<String> confirmFriend( @PathVariable("idFriend") Long idFriend) {
+        User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
-        Friend friend1 = friendService.findByUser_idAndFriend_id(account, friend);
-        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, account);
-        if (friend1 != null) {
-            friend1.setStatus(true);
-            friendService.save(friend1);
-        } else {
+        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
             friend2.setStatus(true);
             friendService.save(friend2);
-        }
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
-
+    @GetMapping("/setFriend/{idFriend}")
+    public ResponseEntity<String> setFriend( @PathVariable("idFriend") Long idFriend) {
+        User user = userDetailService.getCurrentUser();
+        User friend = userService.findById(idFriend).get();
+        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
+        if(friend2 != null){
+            return new ResponseEntity<>("Da send add friend", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Chua ket ban", HttpStatus.OK);
+    }
     // từ chối kết bạn
-    @DeleteMapping("/refuse/{idAcc}/{idFriend}")
-    public ResponseEntity<String> refuseFriend(@PathVariable("idAcc") Long idUser, @PathVariable("idFriend") Long idFriend) {
-        User user = userService.findById(idUser).get();
+    @DeleteMapping("/refuse/{idFriend}")
+    public ResponseEntity<String> refuseFriend( @PathVariable("idFriend") Long idFriend) {
+        User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend f = friendService.findByUser_idAndFriend_id(friend, user);
         friendService.remove(f.getId());
@@ -219,21 +218,21 @@ public class UserController {
     }
 
     // xem danh sách bạn
-    @GetMapping("/showfriend/{idAcc}")
-    public ResponseEntity<List<User>> showListFriend(@PathVariable("idAcc") Long idUser) {
-        User account = userService.findById(idUser).get();
-        List<Friend> list = friendService.findAllByIdAcc(account, true, account, true);
-        List<User> accountList = new ArrayList<>();
+    @GetMapping("/showfriend")
+    public ResponseEntity<List<User>> showListFriend() {
+        User user = userDetailService.getCurrentUser();
+        List<Friend> list = friendService.findAllByIdAcc(user, true, user, true);
+        List<User> userList = new ArrayList<>();
         if (list != null) {
             for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).getUser().getId() == idUser) {
-                    accountList.add(list.get(i).getFriend());
+                if (list.get(i).getUser().getId() == user.getId()) {
+                    userList.add(list.get(i).getFriend());
                 } else {
-                    accountList.add(list.get(i).getUser());
+                    userList.add(list.get(i).getUser());
                 }
             }
         }
-        return new ResponseEntity<>(accountList, HttpStatus.OK);
+        return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 @GetMapping("/page-user")
     public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){

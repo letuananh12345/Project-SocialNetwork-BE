@@ -10,10 +10,17 @@ import java.util.Optional;
 
 public interface IUserService extends IService<User> {
     User loadUserByEmail(String email);
+
     Boolean existsByEmail(String email);
+
     Boolean existsByUsername(String username);
+
     Optional<User> findByUsername(String username);
+
+    Iterable<User> findByFullNameIsContaining(String fullName);
+
     List<User> finAllByRoleName(String roleName);
+
     Iterable<User> findAllByUsernameIsContaining(String username);
     Page<User> findAll(Pageable pageable);
 }
