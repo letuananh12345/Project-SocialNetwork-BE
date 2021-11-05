@@ -18,6 +18,7 @@ public class UserPrinciple implements UserDetails {
     private String fullName;
     private String username;
     private String email;
+    private String phone;
     @JsonIgnore
     private String password;
     private String avatarUrl;
@@ -25,13 +26,14 @@ public class UserPrinciple implements UserDetails {
 
     private Collection<? extends GrantedAuthority> roles;
 
-    public UserPrinciple(Long id, String fullName, String username, String email, String password, String avatarUrl, Boolean isActive
+    public UserPrinciple(Long id, String fullName, String username, String email, String phone, String password, String avatarUrl, Boolean isActive
             , Collection<? extends GrantedAuthority> roles
     ) {
         this.id = id;
         this.fullName = fullName;
         this.username = username;
         this.email = email;
+        this.phone = phone;
         this.password = password;
         this.avatarUrl = avatarUrl;
         this.isActive = isActive;
@@ -48,6 +50,7 @@ public class UserPrinciple implements UserDetails {
                 user.getFullName(),
                 user.getUsername(),
                 user.getEmail(),
+                user.getPhone(),
                 user.getPassword(),
                 user.getAvatarUrl(),
                 user.getIsActive(),

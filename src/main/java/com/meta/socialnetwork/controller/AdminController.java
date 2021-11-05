@@ -54,6 +54,7 @@ public class AdminController {
     JwtAuthTokenFilter jwtAuthTokenFilter;
     @Autowired
     IPostService postService;
+<<<<<<< HEAD
 
     @GetMapping("/page-user")
     public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
@@ -63,10 +64,12 @@ public class AdminController {
         }
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
+=======
+>>>>>>> namluty
 
 
     @PostMapping("/signin")
-    public ResponseEntity<?> login(@Valid @RequestBody SignInForm signInForm){
+    public ResponseEntity<?> login(@RequestBody SignInForm signInForm) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(signInForm.getUsername(), signInForm.getPassword())
@@ -74,11 +77,18 @@ public class AdminController {
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String token = jwtProvider.createToken(authentication);
         UserPrinciple userPrinciple = (UserPrinciple) authentication.getPrincipal();
+<<<<<<< HEAD
         if (userPrinciple.getIsActive()== false){
             return ResponseEntity.ok(new JwtResponse(token, "was_user_block")) ;
         }
         return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(),
                 userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getAuthorities()));
+=======
+        if (userPrinciple.getIsActive() == false) {
+            return new ResponseEntity<>(new ResponseMessage("user_was_blocked"), HttpStatus.OK);
+        }
+        return ResponseEntity.ok(new JwtResponse(token, userPrinciple.getId(), userPrinciple.getAvatarUrl(), userPrinciple.getFullName(), userPrinciple.getEmail(), userPrinciple.getPhone(), userPrinciple.getAuthorities()));
+>>>>>>> namluty
     }
 
     @PostMapping("/signup")
@@ -86,7 +96,7 @@ public class AdminController {
         if (userService.existsByUsername(signUpForm.getUsername())) {
             return new ResponseEntity<>(new ResponseMessage("user_existed"), HttpStatus.OK);
         }
-        if(userService.existsByEmail(signUpForm.getEmail())){
+        if (userService.existsByEmail(signUpForm.getEmail())) {
             return new ResponseEntity<>(new ResponseMessage("no_email"), HttpStatus.OK);
         }
         User users = new User();
@@ -122,8 +132,9 @@ public class AdminController {
     }
 
     @PutMapping("/block/{id}")
-    ResponseEntity<?> bock(@PathVariable Long id){
+    ResponseEntity<?> bock(@PathVariable Long id) {
         User user = userService.findById(id).get();
+<<<<<<< HEAD
             if(user.getIsActive()) {
                 user.setIsActive(false);
                 userService.save(user);
@@ -133,18 +144,28 @@ public class AdminController {
                 userService.save(user);
                 return new ResponseEntity<>("unblock", HttpStatus.OK);
 
+=======
+        if(user.getIsActive()) {
+            user.setIsActive(false);
+            userService.save(user);
+            return new ResponseEntity<>("blocked", HttpStatus.OK);
+        }
+        user.setIsActive(true);
+        userService.save(user);
+        return new ResponseEntity<>("unblock", HttpStatus.OK);
+>>>>>>> namluty
     }
 
     @PutMapping("/change-password")
-    public ResponseEntity<?> changePassword(HttpServletRequest request, @Valid @RequestBody ChangePasswordForm changePasswordForm){
+    public ResponseEntity<?> changePassword(HttpServletRequest request, @Valid @RequestBody ChangePasswordForm changePasswordForm) {
         String jwt = jwtAuthTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromJwtToken(jwt);
         User user;
         try {
-            user = userService.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User Not Found wiht -> username"+username));
+            user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found wiht -> username" + username));
             boolean matches = passwordEncoder.matches(changePasswordForm.getCurrentPassword(), user.getPassword());
-            if(changePasswordForm.getNewPassword() != null){
-                if(matches){
+            if (changePasswordForm.getNewPassword() != null) {
+                if (matches) {
                     user.setPassword(passwordEncoder.encode(changePasswordForm.getNewPassword()));
                     userService.save(user);
                 } else {
@@ -152,55 +173,59 @@ public class AdminController {
                 }
             }
             return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
-        } catch (UsernameNotFoundException exception){
+        } catch (UsernameNotFoundException exception) {
             return new ResponseEntity<>(new ResponseMessage(exception.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
 
     @PutMapping("/change-avatar")
-    public ResponseEntity<?> changeAvatar(HttpServletRequest request, @Valid @RequestBody ChangeAvatar changeAvatar){
+    public ResponseEntity<?> changeAvatar(HttpServletRequest request, @Valid @RequestBody ChangeAvatar changeAvatar) {
         String jwt = jwtAuthTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromJwtToken(jwt);
         User user;
         try {
-            if(changeAvatar.getAvatarUrl()==null){
+            if (changeAvatar.getAvatarUrl() == null) {
                 return new ResponseEntity<>(new ResponseMessage("no"), HttpStatus.OK);
             } else {
-                user = userService.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User Not Found -> username"+username));
+                user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found -> username" + username));
                 user.setAvatarUrl(changeAvatar.getAvatarUrl());
                 userService.save(user);
                 Post post = new Post();
                 post.setUser(user);
                 post.setContent(user.getFullName() + " đã thay ảnh đại diện");
                 post.setImageUrl(changeAvatar.getAvatarUrl());
+<<<<<<< HEAD
                 post.setStatus("public");
+=======
+>>>>>>> namluty
                 LocalDate localDate = LocalDate.now();
                 post.setCreated_date(localDate);
                 postService.save(post);
             }
             return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
-        } catch (UsernameNotFoundException exception){
+        } catch (UsernameNotFoundException exception) {
             return new ResponseEntity<>(new ResponseMessage(exception.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
 
     @PutMapping("/change-profile")
-    public ResponseEntity<?> changeProfile(HttpServletRequest request, @Valid @RequestBody ChangeProfileForm changeProfileForm){
+    public ResponseEntity<?> changeProfile(HttpServletRequest request, @Valid @RequestBody ChangeProfileForm changeProfileForm) {
         String jwt = jwtAuthTokenFilter.getJwt(request);
         String username = jwtProvider.getUsernameFromJwtToken(jwt);
         User user;
         try {
-            if(userService.existsByEmail(changeProfileForm.getEmail())){
+            if (userService.existsByEmail(changeProfileForm.getEmail())) {
                 return new ResponseEntity<>(new ResponseMessage("noemail"), HttpStatus.OK);
             }
-            user = userService.findByUsername(username).orElseThrow(()-> new UsernameNotFoundException("User Not Found with -> useranme"+username));
+            user = userService.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User Not Found with -> useranme" + username));
             user.setFullName(changeProfileForm.getFullName());
             user.setEmail(changeProfileForm.getEmail());
             user.setPhone(changeProfileForm.getPhone());
             userService.save(user);
             return new ResponseEntity<>(new ResponseMessage("yes"), HttpStatus.OK);
-        } catch (UsernameNotFoundException exception){
-            return new ResponseEntity<>(new ResponseMessage(exception.getMessage()),HttpStatus.NOT_FOUND );
+        } catch (UsernameNotFoundException exception) {
+            return new ResponseEntity<>(new ResponseMessage(exception.getMessage()), HttpStatus.NOT_FOUND);
         }
     }
 }
+// nam test

@@ -9,6 +9,10 @@ import com.meta.socialnetwork.service.like.ILikeService;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,6 +22,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static org.springframework.data.domain.Sort.Direction.ASC;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -158,13 +164,10 @@ public class UserController {
     }
 
     // tìm kiếm bạn theo tên
-    @GetMapping("findFriend")
-    public ResponseEntity<?> findFriend(@RequestBody User user) {
-        Iterable<User> user1 = userService.findAllByUsernameIsContaining(user.getUsername());
-        if (user1 != null) {
+    @GetMapping("findFriend/{username}")
+    public ResponseEntity<?> findFriend(@PathVariable String username) {
+        Iterable<User> user1 = userService.findAllByUsernameIsContaining(username);
             return new ResponseEntity<>(user1, HttpStatus.OK);
-        } else
-            return new ResponseEntity<>("no user", HttpStatus.OK);
     }
 
     // gửi yêu cầu kết bạn
@@ -173,7 +176,10 @@ public class UserController {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend friend1 = friendService.findByUser_idAndFriend_id(user, friend);
+<<<<<<< HEAD
 //        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
+=======
+>>>>>>> namluty
         if (friend1 == null ) {
             Friend newFriend = new Friend();
             newFriend.setUser(user);
@@ -190,6 +196,7 @@ public class UserController {
     public ResponseEntity<String> confirmFriend( @PathVariable("idFriend") Long idFriend) {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
+<<<<<<< HEAD
 //        Friend friend1 = friendService.findByUser_idAndFriend_id(user, friend);
         Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
 //        if (friend1 != null) {
@@ -199,9 +206,23 @@ public class UserController {
             friend2.setStatus(true);
             friendService.save(friend2);
 //        }
+=======
+        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
+            friend2.setStatus(true);
+            friendService.save(friend2);
+>>>>>>> namluty
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
-
+    @GetMapping("/setFriend/{idFriend}")
+    public ResponseEntity<String> setFriend( @PathVariable("idFriend") Long idFriend) {
+        User user = userDetailService.getCurrentUser();
+        User friend = userService.findById(idFriend).get();
+        Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
+        if(friend2 != null){
+            return new ResponseEntity<>("Da send add friend", HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Chua ket ban", HttpStatus.OK);
+    }
     // từ chối kết bạn
     @DeleteMapping("/refuse/{idFriend}")
     public ResponseEntity<String> refuseFriend( @PathVariable("idFriend") Long idFriend) {
@@ -229,6 +250,12 @@ public class UserController {
         }
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
-
-
+@GetMapping("/page-user")
+    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
+    Page<User> userPage = userService.findAll(pageable);
+    if(userPage.isEmpty()){
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+    return new ResponseEntity<>(userPage, HttpStatus.OK);
+}
 }
