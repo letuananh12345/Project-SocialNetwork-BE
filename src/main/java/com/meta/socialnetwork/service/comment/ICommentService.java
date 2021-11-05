@@ -8,4 +8,5 @@ public interface ICommentService extends IService<Comment> {
     @Query("select cmt from Comment cmt where cmt.post.id = ?1")
     Iterable<Comment> findAllByPost_Id(Long id);
     void deleteAll(Iterable<? extends Comment> iterable);
+    Comment saves(Comment comment);
 }

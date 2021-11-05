@@ -16,11 +16,10 @@ public interface IUserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-<<<<<<< HEAD
-=======
+
     Iterable<User> findByFullNameIsContaining(String fullName);
 
->>>>>>> namluty
+
     User findByEmail(String email);
 
     Iterable<User> findAllByUsernameIsContaining(String username);

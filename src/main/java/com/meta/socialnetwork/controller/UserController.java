@@ -133,27 +133,31 @@ public class UserController {
 
     // create comment
     @PostMapping("/comment/{idPost}")
-    public ResponseEntity<String> createComment(@RequestBody Comment comment, @PathVariable("idPost") Long idPost) {
+    public ResponseEntity<Comment> createComment(@RequestBody Comment comment, @PathVariable("idPost") Long idPost) {
         User user = userDetailService.getCurrentUser();
-        Post post = postService.findById(idPost).get();
+        Post post = new Post();
+        post.setId(idPost);
         comment.setUser(user);
         comment.setPost(post);
         LocalDate localDate = LocalDate.now();
         comment.setCreated_date(localDate);
-        commentService.save(comment);
+        return new ResponseEntity<>(commentService.saves(comment), HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>("Ok", HttpStatus.OK);
+    @GetMapping("/showComment/{idPost}")
+    public ResponseEntity<?> listComment(@PathVariable("idPost") Long id){
+        Iterable<Comment> comments = commentService.findAllByPost_Id(id);
+        return new ResponseEntity<>(comments, HttpStatus.OK);
     }
 
     // sửa comment
     @PutMapping("/updatecomment/{id}")
-    public ResponseEntity<String> updateComment(@PathVariable Long id, @RequestBody Comment comment) {
+    public ResponseEntity<Comment> updateComment(@PathVariable Long id, @RequestBody Comment comment) {
         Comment comment1 = commentService.findById(id).get();
         comment1.setContent(comment.getContent());
         LocalDate localDate = LocalDate.now();
         comment1.setModified_date(localDate);
-        commentService.save(comment1);
-        return new ResponseEntity<>("Ok", HttpStatus.OK);
+        return new ResponseEntity<>(commentService.saves(comment1), HttpStatus.OK);
     }
 
     // xóa comment
@@ -167,7 +171,7 @@ public class UserController {
     @GetMapping("findFriend/{username}")
     public ResponseEntity<?> findFriend(@PathVariable String username) {
         Iterable<User> user1 = userService.findAllByUsernameIsContaining(username);
-            return new ResponseEntity<>(user1, HttpStatus.OK);
+        return new ResponseEntity<>(user1, HttpStatus.OK);
     }
 
     // gửi yêu cầu kết bạn
@@ -176,7 +180,7 @@ public class UserController {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend friend1 = friendService.findByUser_idAndFriend_id(user, friend);
-        if (friend1 == null ) {
+        if (friend1 == null) {
             Friend newFriend = new Friend();
             newFriend.setUser(user);
             newFriend.setFriend(friend);
@@ -189,27 +193,29 @@ public class UserController {
 
     // chấp nhận kết bạn
     @GetMapping("/confirmfriend/{idFriend}")
-    public ResponseEntity<String> confirmFriend( @PathVariable("idFriend") Long idFriend) {
+    public ResponseEntity<String> confirmFriend(@PathVariable("idFriend") Long idFriend) {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
-            friend2.setStatus(true);
-            friendService.save(friend2);
+        friend2.setStatus(true);
+        friendService.save(friend2);
         return new ResponseEntity<>("ok", HttpStatus.OK);
     }
+
     @GetMapping("/setFriend/{idFriend}")
-    public ResponseEntity<String> setFriend( @PathVariable("idFriend") Long idFriend) {
+    public ResponseEntity<String> setFriend(@PathVariable("idFriend") Long idFriend) {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend friend2 = friendService.findByUser_idAndFriend_id(friend, user);
-        if(friend2 != null){
+        if (friend2 != null) {
             return new ResponseEntity<>("Da send add friend", HttpStatus.OK);
         }
         return new ResponseEntity<>("Chua ket ban", HttpStatus.OK);
     }
+
     // từ chối kết bạn
     @DeleteMapping("/refuse/{idFriend}")
-    public ResponseEntity<String> refuseFriend( @PathVariable("idFriend") Long idFriend) {
+    public ResponseEntity<String> refuseFriend(@PathVariable("idFriend") Long idFriend) {
         User user = userDetailService.getCurrentUser();
         User friend = userService.findById(idFriend).get();
         Friend f = friendService.findByUser_idAndFriend_id(friend, user);
@@ -234,12 +240,4 @@ public class UserController {
         }
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
-@GetMapping("/page-user")
-    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
-    Page<User> userPage = userService.findAll(pageable);
-    if(userPage.isEmpty()){
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-    return new ResponseEntity<>(userPage, HttpStatus.OK);
-}
 }

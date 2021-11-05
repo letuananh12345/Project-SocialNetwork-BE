@@ -7,4 +7,5 @@ public interface IService<M>{
     Optional<M> findById(Long id);
     void save(M m);
     void remove(Long id);
+
 }

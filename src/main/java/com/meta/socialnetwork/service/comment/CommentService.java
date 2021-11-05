@@ -40,4 +40,9 @@ public class CommentService implements ICommentService{
     public void deleteAll(Iterable<? extends Comment> iterable) {
         commentRepo.deleteAll(iterable);
     }
+
+    @Override
+    public Comment saves(Comment comment) {
+        return commentRepo.save(comment);
+    }
 }

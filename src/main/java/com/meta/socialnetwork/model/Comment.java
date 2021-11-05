@@ -1,5 +1,6 @@
 package com.meta.socialnetwork.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -22,9 +23,11 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private Post post;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
+    @JsonIgnore
     private Comment rep_comment;
 }
