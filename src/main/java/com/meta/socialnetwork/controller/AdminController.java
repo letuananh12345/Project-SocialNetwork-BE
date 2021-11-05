@@ -57,13 +57,14 @@ public class AdminController {
 
 
     @GetMapping("/page-user")
-    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
+    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
         Page<User> userPage = userService.findAll(pageable);
-        if (userPage.isEmpty()) {
+        if(userPage.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
+
 
 
     @PostMapping("/signin")
@@ -126,14 +127,14 @@ public class AdminController {
     @PutMapping("/block/{id}")
     ResponseEntity<?> bock(@PathVariable Long id) {
         User user = userService.findById(id).get();
-        if (user.getIsActive()) {
-            user.setIsActive(false);
-            userService.save(user);
-            return new ResponseEntity<>("blocked", HttpStatus.OK);
-        }
-        user.setIsActive(true);
-        userService.save(user);
-        return new ResponseEntity<>("unblock", HttpStatus.OK);
+            if(user.getIsActive()) {
+                user.setIsActive(false);
+                userService.save(user);
+                return new ResponseEntity<>("blocked", HttpStatus.OK);
+            }
+                user.setIsActive(true);
+                userService.save(user);
+                return new ResponseEntity<>("unblock", HttpStatus.OK);
 
     }
 
@@ -206,5 +207,4 @@ public class AdminController {
         }
     }
 }
-
-
+//fix error

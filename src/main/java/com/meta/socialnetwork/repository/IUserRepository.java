@@ -16,9 +16,7 @@ public interface IUserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-
     Iterable<User> findByFullNameIsContaining(String fullName);
-
 
     User findByEmail(String email);
 
