@@ -17,17 +17,14 @@ public interface IUserService extends IService<User> {
 
     Optional<User> findByUsername(String username);
 
-<<<<<<< HEAD
+
     List<User> finAllByRoleName(String roleName);
 
     Iterable<User> findAllByUsernameIsContaining(String username);
 
-=======
+
     Iterable<User> findByFullNameIsContaining(String fullName);
 
-    List<User> finAllByRoleName(String roleName);
 
-    Iterable<User> findAllByUsernameIsContaining(String username);
->>>>>>> namluty
     Page<User> findAll(Pageable pageable);
 }
