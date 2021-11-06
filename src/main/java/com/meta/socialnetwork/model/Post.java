@@ -33,7 +33,7 @@ public class Post {
     @ToString.Exclude
     private List<Comment> commentList;
 
-    @OneToMany
+    @OneToMany(mappedBy = "posts")
     @ToString.Exclude
     private List<Like> likeList;
 

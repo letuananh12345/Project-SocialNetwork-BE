@@ -100,19 +100,19 @@ public class UserController {
 
     // tạo like
     @GetMapping("/likeshow/{idPost}")
-    public ResponseEntity<?> createlike(@PathVariable("idPost") Long idPost) {
+    public ResponseEntity<Like> createlike(@PathVariable("idPost") Long idPost) {
         User user = userDetailService.getCurrentUser();
         Like like = likeService.findByPostsIdAndUserId(idPost, user.getId());
         if (like != null) {
             likeService.remove(like.getId());
+            return new ResponseEntity<>(HttpStatus.OK);
         } else {
             Post post = postService.findById(idPost).get();
             Like like1 = new Like();
             like1.setUser(user);
             like1.setPosts(post);
-            likeService.save(like1);
+            return new ResponseEntity<>(likeService.saves(like1),HttpStatus.OK);
         }
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     //listlike
@@ -239,5 +239,13 @@ public class UserController {
             }
         }
         return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
+
+    // hien user gui kb
+    @GetMapping("/showfriendadd")
+    public ResponseEntity<List<Friend>> showAddFriend(){
+        User user = userDetailService.getCurrentUser();
+        List< Friend> list = friendService.findFriendAdd(user);
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 }

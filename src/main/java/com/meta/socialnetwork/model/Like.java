@@ -1,5 +1,6 @@
 package com.meta.socialnetwork.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -16,6 +17,8 @@ public class Like {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "posts_id")
     private Post posts;
 }

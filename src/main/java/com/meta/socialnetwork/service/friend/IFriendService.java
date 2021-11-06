@@ -3,6 +3,7 @@ package com.meta.socialnetwork.service.friend;
 import com.meta.socialnetwork.model.Friend;
 import com.meta.socialnetwork.model.User;
 import com.meta.socialnetwork.service.IService;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
@@ -12,5 +13,7 @@ public interface IFriendService extends IService<Friend> {
     List<Friend> findAllByIdAcc(User account, Boolean status1, User friend, Boolean status2);
 
     Boolean isFriend(User account, User friend1, Boolean status1, User user, User friend, Boolean status2);
+
+    List<Friend> findFriendAdd(User user);
 
 }
