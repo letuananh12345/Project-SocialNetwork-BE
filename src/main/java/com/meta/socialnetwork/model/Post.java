@@ -12,7 +12,6 @@ import java.util.Objects;
 @Entity
 @Getter
 @Setter
-@ToString
 @Table(name = "posts")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,11 +30,9 @@ public class Post {
     private User user;
 
     @OneToMany(mappedBy = "post")
-    @ToString.Exclude
     private List<Comment> commentList;
 
     @OneToMany(mappedBy = "posts")
-    @ToString.Exclude
     private List<Like> likeList;
 
     @Override

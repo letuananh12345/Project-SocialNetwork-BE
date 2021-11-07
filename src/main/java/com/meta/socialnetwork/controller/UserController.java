@@ -1,5 +1,6 @@
 package com.meta.socialnetwork.controller;
 
+import com.meta.socialnetwork.dto.response.Response;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
 import com.meta.socialnetwork.model.*;
 import com.meta.socialnetwork.security.userPrinciple.UserDetailServiceImpl;
@@ -157,12 +158,12 @@ public class UserController {
         comment.setPost(post);
         LocalDate localDate = LocalDate.now();
         comment.setCreated_date(localDate);
-        commentService.saves(comment);
+        Comment newComment = commentService.saves(comment);
         Notification notification = new Notification();
-        notification.setComment(comment);
+        notification.setComment(newComment);
         notification.setNotify(notification.getComment().getUser().getFullName() + " đã comment bài viết");
         notificationService.saves(notification);
-        return new ResponseEntity<>(comment, HttpStatus.OK);
+        return new ResponseEntity<>(newComment, HttpStatus.OK);
     }
 
     @GetMapping("/showComment/{idPost}")
@@ -183,9 +184,9 @@ public class UserController {
 
     // xóa comment
     @DeleteMapping("/deletecomment/{id}")
-    public ResponseEntity<String> deleteComment(@PathVariable("id") Long id) {
+    public ResponseEntity<Response> deleteComment(@PathVariable("id") Long id) {
         commentService.remove(id);
-        return new ResponseEntity<>("Ok", HttpStatus.OK);
+        return new ResponseEntity<>(new Response("200", "deleted", "ok"), HttpStatus.OK);
     }
 
     // tìm kiếm bạn theo tên

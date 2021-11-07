@@ -32,7 +32,7 @@ public class NotificationService implements INotificationService{
 
     @Override
     public void remove(Long id) {
-
+        notificationRepo.findById(id);
     }
 
     @Override
@@ -57,7 +57,12 @@ public class NotificationService implements INotificationService{
 
     @Override
     public Iterable<Notification> findAllByComment_Post_UserOrderByComment(User user) {
-        return notificationRepo.findAllByComment_Post_UserOrderByCommentDesc(user);
+        Iterable<Notification> notifications = notificationRepo.findAllByComment_Post_UserOrderByCommentDesc(user);
+        notifications.forEach(notification -> {
+            notification.setPostId(notification.getComment().getPost().getId());
+        });
+        return notifications;
+
     }
 
     @Override

@@ -20,4 +20,7 @@ public class Notification {
     @OneToOne
     @JoinColumn(name = "comment_id")
     private Comment comment;
+
+    @Transient
+    private Long postId;
 }
