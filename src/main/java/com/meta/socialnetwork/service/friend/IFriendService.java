@@ -14,6 +14,6 @@ public interface IFriendService extends IService<Friend> {
 
     Boolean isFriend(User account, User friend1, Boolean status1, User user, User friend, Boolean status2);
 
-    List<Friend> findFriendAdd(User user);
+    List<Friend> findFriendAdd(User user, Boolean status);
 
 }
