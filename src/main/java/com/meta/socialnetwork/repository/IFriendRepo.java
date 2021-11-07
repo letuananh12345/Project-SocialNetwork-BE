@@ -20,4 +20,7 @@ public interface IFriendRepo extends JpaRepository<Friend,Long> {
     @Query("select f from Friend f where f.friend =?1 and f.status =?2")
     List<Friend> findFriendAdd(User user, Boolean status);
 
+    @Query("select f from Friend f where f.user =?1 and f.status =?2")
+    List<Friend> findFriendRequest(User user, Boolean status);
+
 }

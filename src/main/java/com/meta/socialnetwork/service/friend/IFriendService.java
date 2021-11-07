@@ -16,4 +16,7 @@ public interface IFriendService extends IService<Friend> {
 
     List<Friend> findFriendAdd(User user, Boolean status);
 
+    List<Friend> findFriendRequest(User user, Boolean status);
+
+
 }

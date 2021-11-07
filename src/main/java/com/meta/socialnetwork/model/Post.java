@@ -1,5 +1,6 @@
 package com.meta.socialnetwork.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 

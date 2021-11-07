@@ -1,6 +1,7 @@
 package com.meta.socialnetwork.service.notification;
 
 import com.meta.socialnetwork.model.Comment;
+import com.meta.socialnetwork.model.Like;
 import com.meta.socialnetwork.model.Notification;
 import com.meta.socialnetwork.model.User;
 import com.meta.socialnetwork.repository.INotificationRepo;
@@ -52,6 +53,21 @@ public class NotificationService implements INotificationService{
     @Override
     public Notification findByComment(Comment comment) {
         return notificationRepo.findByComment(comment);
+    }
+
+    @Override
+    public Iterable<Notification> findAllByComment_Post_UserOrderByComment(User user) {
+        return notificationRepo.findAllByComment_Post_UserOrderByCommentDesc(user);
+    }
+
+    @Override
+    public Iterable<Notification> findAllByLike_Posts_UserOrderByCommentDesc(User user) {
+        return notificationRepo.findAllByLike_Posts_UserOrderByCommentDesc(user);
+    }
+
+    @Override
+    public Notification findByLike(Like like) {
+        return notificationRepo.findByLike(like);
     }
 
 

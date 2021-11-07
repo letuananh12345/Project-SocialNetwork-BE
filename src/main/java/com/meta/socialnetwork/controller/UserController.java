@@ -10,6 +10,7 @@ import com.meta.socialnetwork.service.like.ILikeService;
 import com.meta.socialnetwork.service.notification.INotificationService;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.user.IUserService;
+import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -115,13 +116,19 @@ public class UserController {
         Like like = likeService.findByPostsIdAndUserId(idPost, user.getId());
         if (like != null) {
             likeService.remove(like.getId());
+//            notificationService.remove(notificationService.findByLike(like).getId());
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             Post post = postService.findById(idPost).get();
             Like like1 = new Like();
             like1.setUser(user);
             like1.setPosts(post);
-            return new ResponseEntity<>(likeService.saves(like1), HttpStatus.OK);
+            likeService.saves(like1);
+//            Notification notification = new Notification();
+//            notification.setNotify(notification.getLike().getUser().getFullName() +" đã like bài viết");
+//            notification.setLike(like1);
+//            notificationService.saves(notification);
+            return new ResponseEntity<>(like1, HttpStatus.OK);
         }
     }
 
@@ -283,10 +290,47 @@ public class UserController {
         return new ResponseEntity<>(userList, HttpStatus.OK);
     }
 
-    @GetMapping("/listNotify/{id}")
-    public ResponseEntity<Notification> getNot(@PathVariable Long id) {
-        Notification notification = notificationService.findById(id).get();
+    // danh sách lời kết bạn đã gửi
+    @GetMapping("/showFriendRequest")
+    public ResponseEntity<List<User>> getFriendResquest(){
+        User user = userDetailService.getCurrentUser();
+        List<Friend> list = friendService.findFriendRequest(user, false);
+        List<User> userList = new ArrayList<>();
+        if (list != null) {
+            for (int i = 0; i < list.size(); i++) {
+                userList.add(list.get(i).getFriend());
+            }
+        }
+        return new ResponseEntity<>(userList, HttpStatus.OK);
+    }
+
+    // gỡ lời mời kết bạn đã gửi
+    @DeleteMapping("/deleteRequest/{idFriend}")
+    public ResponseEntity<User> deleteRequest(@PathVariable("idFriend") Long idFriend) {
+        User user = userDetailService.getCurrentUser();
+        User friend = userService.findById(idFriend).get();
+        Friend f = friendService.findByUser_idAndFriend_id(user, friend);
+        friendService.remove(f.getId());
+        return new ResponseEntity<>(friend, HttpStatus.OK);
+    }
+
+    @GetMapping("/listNotify")
+    public ResponseEntity<Iterable<Notification>> getNot() {
+//        Iterable<Notification> notification = notificationService.findAllByComment_Post_User(userDetailService.getCurrentUser());
+        Iterable<Notification> notification = notificationService.findAllByComment_Post_UserOrderByComment(userDetailService.getCurrentUser());
         return new ResponseEntity<>(notification, HttpStatus.OK);
+    }
+
+    @GetMapping("/listNotifyByLike")
+    public ResponseEntity<Iterable<Notification>> getNotByLike() {
+        Iterable<Notification> notification = notificationService.findAllByLike_Posts_UserOrderByCommentDesc(userDetailService.getCurrentUser());
+        return new ResponseEntity<>(notification, HttpStatus.OK);
+    }
+
+    @GetMapping("/showPostNotification/{id}")
+    public ResponseEntity<Post> showPostNotification(@PathVariable Long id){
+        Post post = postService.findById(id).get();
+        return new ResponseEntity<>(post, HttpStatus.OK);
     }
 
 }
