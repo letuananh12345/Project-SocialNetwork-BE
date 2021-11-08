@@ -15,6 +15,7 @@ import com.meta.socialnetwork.service.role.IRoleService;
 import com.meta.socialnetwork.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -64,8 +65,6 @@ public class AdminController {
         }
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
-
-
 
     @PostMapping("/signin")
     public ResponseEntity<?> login(@RequestBody SignInForm signInForm) {

@@ -1,6 +1,9 @@
 package com.meta.socialnetwork.model;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -15,6 +18,9 @@ import java.util.Objects;
 @Table(name = "posts")
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,6 +40,9 @@ public class Post {
 
     @OneToMany(mappedBy = "posts")
     private List<Like> likeList;
+
+    @Transient
+    private Long commentId;
 
     @Override
     public boolean equals(Object o) {

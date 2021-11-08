@@ -12,9 +12,9 @@ import java.time.LocalDate;
 @Entity
 @Data
 @Table(name = "comments")
-//@JsonIdentityInfo(
-//        generator = ObjectIdGenerators.PropertyGenerator.class,
-//        property = "id")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class Comment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,15 +29,15 @@ public class Comment {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    @JsonIgnore
     private Post post;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "comment")
     private Notification notification;
 
 
-    @ManyToOne
+    @ManyToOne()
     @JoinColumn(name = "parent_id")
     @JsonIgnore
     private Comment rep_comment;
+
 }
