@@ -175,7 +175,6 @@ public class AdminController {
                 Post post = new Post();
                 post.setUser(user);
                 post.setContent(user.getFullName() + " đã thay ảnh đại diện");
-                post.setImageUrl(changeAvatar.getAvatarUrl());
                 post.setStatus("public");
                 LocalDate localDate = LocalDate.now();
                 post.setCreated_date(localDate);

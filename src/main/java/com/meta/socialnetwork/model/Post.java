@@ -1,6 +1,4 @@
 package com.meta.socialnetwork.model;
-
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.hibernate.Hibernate;
 
@@ -21,7 +19,9 @@ public class Post {
     private Long id;
     private String content;
     private String status;
-    private String imageUrl;
+    @ManyToMany
+    @JoinTable(name = "post_image", joinColumns = @JoinColumn(name = "post_id"), inverseJoinColumns = @JoinColumn(name = "image_id"))
+    private List<Image> imageUrl;
     private LocalDate created_date;
     private LocalDate modified_date;
 

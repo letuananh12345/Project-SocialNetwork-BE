@@ -11,7 +11,7 @@ import com.meta.socialnetwork.service.like.ILikeService;
 import com.meta.socialnetwork.service.notification.INotificationService;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.user.IUserService;
-import javafx.geometry.Pos;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -93,6 +93,28 @@ public class UserController {
         return new ResponseEntity<>(post, HttpStatus.CREATED);
     }
 
+    @PutMapping("/update-post/{id}")
+    public ResponseEntity<Post> updatePost(@PathVariable Long id, @RequestBody Post post) {
+        User user = userDetailService.getCurrentUser();
+        post.setUser(user);
+        Optional<Post> currentPost = postService.findById(id);// ra 1 doi tuong
+        if (!currentPost.isPresent()) {
+            return new ResponseEntity<Post>(post, HttpStatus.OK);
+        }
+        post.setId(id);
+        if (post.getContent() == null || post.getContent().trim().equals("")) {
+            post.setContent(currentPost.get().getContent());
+        }
+        if (post.getStatus() == null || post.getStatus().trim().equals("")) {
+            post.setStatus(currentPost.get().getStatus());
+        }
+        if (post.getImageUrl() == null || post.getImageUrl().size() == 0) {
+            post.setImageUrl(currentPost.get().getImageUrl());
+        }
+        postService.save(post);
+        return new ResponseEntity<>(post, HttpStatus.OK);
+    }
+
     //xóa bài post
     @GetMapping("/deletepost/{idPost}")
     public ResponseEntity<String> deletePost(@PathVariable Long idPost) {
@@ -144,7 +166,7 @@ public class UserController {
     //showlike theo post
     @GetMapping("/listlike/{id}")
     public ResponseEntity<Iterable<Like>> getlistlikePost(@PathVariable Long id) {
-        Iterable<Like> lists =  likeService.findAllLikeByPosts_Id(id);
+        Iterable<Like> lists = likeService.findAllLikeByPosts_Id(id);
         return new ResponseEntity<>(lists, HttpStatus.OK);
     }
 
@@ -293,7 +315,7 @@ public class UserController {
 
     // danh sách lời kết bạn đã gửi
     @GetMapping("/showFriendRequest")
-    public ResponseEntity<List<User>> getFriendResquest(){
+    public ResponseEntity<List<User>> getFriendResquest() {
         User user = userDetailService.getCurrentUser();
         List<Friend> list = friendService.findFriendRequest(user, false);
         List<User> userList = new ArrayList<>();
@@ -329,7 +351,7 @@ public class UserController {
     }
 
     @GetMapping("/showPostNotification/{id}")
-    public ResponseEntity<Post> showPostNotification(@PathVariable Long id){
+    public ResponseEntity<Post> showPostNotification(@PathVariable Long id) {
         Post post = postService.findById(id).get();
         return new ResponseEntity<>(post, HttpStatus.OK);
     }
