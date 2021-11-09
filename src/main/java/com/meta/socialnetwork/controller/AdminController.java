@@ -4,14 +4,12 @@ import com.meta.socialnetwork.dto.request.*;
 import com.meta.socialnetwork.dto.response.JwtResponse;
 import com.meta.socialnetwork.dto.response.Response;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
-import com.meta.socialnetwork.model.Post;
-import com.meta.socialnetwork.model.Role;
-import com.meta.socialnetwork.model.RoleName;
-import com.meta.socialnetwork.model.User;
+import com.meta.socialnetwork.model.*;
 import com.meta.socialnetwork.security.jwt.JwtAuthTokenFilter;
 import com.meta.socialnetwork.security.jwt.JwtProvider;
 import com.meta.socialnetwork.security.userPrinciple.UserDetailServiceImpl;
 import com.meta.socialnetwork.security.userPrinciple.UserPrinciple;
+import com.meta.socialnetwork.service.friend.IFriendService;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.role.IRoleService;
 import com.meta.socialnetwork.service.user.IUserService;
@@ -61,6 +59,8 @@ public class AdminController {
     JwtAuthTokenFilter jwtAuthTokenFilter;
     @Autowired
     IPostService postService;
+    @Autowired
+    IFriendService friendService;
 
 
     @GetMapping("/page-user")
@@ -84,12 +84,16 @@ public class AdminController {
     @GetMapping("/page-user2")
     public ResponseEntity<?> pageUser2() {
         List<User> userPage = (List<User>) userService.findAllByOrderByIdDesc();
+        User user = userDetailService.getCurrentUser();
         List<User> list = new ArrayList<>();
         for (int i = 0; i < userPage.size(); i++) {
             if (userPage.get(i).getId() != userDetailService.getCurrentUser().getId()) {
-                list.add(userPage.get(i));
-                if (list.size() == 3) {
-                    return new ResponseEntity<>(list, HttpStatus.OK);
+                Friend friend = friendService.suggestion(user,userPage.get(i),userPage.get(i), user);
+                if(friend == null) {
+                    list.add(userPage.get(i));
+                    if (list.size() == 3) {
+                        return new ResponseEntity<>(list, HttpStatus.OK);
+                    }
                 }
             }
         }

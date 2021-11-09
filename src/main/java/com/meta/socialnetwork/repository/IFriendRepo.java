@@ -11,6 +11,9 @@ public interface IFriendRepo extends JpaRepository<Friend,Long> {
     @Query("select f from Friend f where f.user = ?1 and  f.friend = ?2")
     Friend findByUser_idAndFriend_id(User user, User friend);
 
+    @Query("select f from Friend f where f.user = ?1 and  f.friend = ?2 or f.friend =?3 and f.user =?4")
+    Friend suggestion(User user, User friend, User user1, User friend1);
+
     @Query("select f from Friend f where f.user = ?1 and f.status = ?2 or f.friend = ?3 and f.status = ?4")
     List<Friend> findAllByIdAcc(User account, Boolean status1, User friend, Boolean status2);
 
