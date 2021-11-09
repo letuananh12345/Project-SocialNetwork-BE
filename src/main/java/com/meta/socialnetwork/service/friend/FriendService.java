@@ -58,4 +58,9 @@ public class FriendService implements IFriendService{
         return friendRepo.findFriendRequest(user, status);
     }
 
+    @Override
+    public Friend suggestion(User user, User friend, User user1, User friend1) {
+        return friendRepo.suggestion(user, friend, user1, friend1);
+    }
+
 }

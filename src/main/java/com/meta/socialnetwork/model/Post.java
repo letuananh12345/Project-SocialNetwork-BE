@@ -27,6 +27,8 @@ public class Post {
     private Long id;
     private String content;
     private String status;
+    @Column(length = 10000)
+    // giới hạn chuỗi
     private String imageUrl;
     private LocalDate created_date;
     private LocalDate modified_date;
