@@ -27,4 +27,8 @@ public interface IUserService extends IService<User> {
 
 
     Page<User> findAll(Pageable pageable);
+
+    Iterable<User> findAllByOrderByIdDesc();
+
+
 }

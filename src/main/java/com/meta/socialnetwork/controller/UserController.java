@@ -4,21 +4,16 @@ import com.meta.socialnetwork.dto.response.Response;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
 import com.meta.socialnetwork.model.*;
 import com.meta.socialnetwork.security.userPrinciple.UserDetailServiceImpl;
-import com.meta.socialnetwork.security.userPrinciple.UserPrinciple;
 import com.meta.socialnetwork.service.comment.ICommentService;
 import com.meta.socialnetwork.service.friend.IFriendService;
 import com.meta.socialnetwork.service.like.ILikeService;
 import com.meta.socialnetwork.service.notification.INotificationService;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.user.IUserService;
-import javafx.geometry.Pos;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,8 +21,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.springframework.data.domain.Sort.Direction.ASC;
 
 @RestController
 @CrossOrigin(origins = "*")
@@ -49,10 +42,20 @@ public class UserController {
     @Autowired
     INotificationService notificationService;
 
+    // timeline
     @GetMapping("/showPost")
     public ResponseEntity<?> getListPost() {
-        Iterable<Post> postPage = postService.findAllByOrderByIdDesc();
-        return new ResponseEntity<>(postPage, HttpStatus.OK);
+        List<Post> postPage = (List<Post>) postService.findAllByOrderByIdDesc();
+        List<Post> newPost = new ArrayList<>();
+        for (int i = 0; i < postPage.size(); i++) {
+            if (postPage.get(i).getStatus().equals("public") || postPage.get(i).getStatus().equals("friend")) {
+                newPost.add(postPage.get(i));
+                if (newPost.size() == 12) {
+                    return new ResponseEntity<>(newPost, HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>(newPost, HttpStatus.OK);
     }
 
     @GetMapping("/showPostProfile")
@@ -69,17 +72,10 @@ public class UserController {
     }
 
     //show post theo id_user
-    @GetMapping("/showPostUser/{id}/{idPost}")
-    public ResponseEntity<?> showPostUser(@PathVariable Long id, @PathVariable Long idPost) {
-        User user = userService.findById(id).get();
-        User user1 = userService.findById(idPost).get();
-        if (friendService.isFriend(user, user1, true, user1, user, true)) {
-            List<Post> list = postService.findPostsByStatus(id, "public", "friend");
-            if (list != null) {
-                return new ResponseEntity<>(list, HttpStatus.OK);
-            }
-            return new ResponseEntity<>("no post", HttpStatus.OK);
-        } else return new ResponseEntity<>("no friend", HttpStatus.OK);
+    @GetMapping("/showPostUser/{idPost}")
+    public ResponseEntity<?> showPostUser(@PathVariable Long idPost) {
+        List<Post> list = postService.findPostsByStatus(idPost, "public", "friend");
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     // tạo bài post
@@ -91,6 +87,33 @@ public class UserController {
         post.setCreated_date(localDate);
         postService.save(post);
         return new ResponseEntity<>(post, HttpStatus.CREATED);
+    }
+
+    // sửa bài post
+    @PutMapping("updatePost/{id}")
+    public ResponseEntity<Response> editPost(@PathVariable Long id, @RequestBody Post post) {
+        Optional<Post> currentPost = postService.findById(id);// ra 1 doi tuong
+        if (!currentPost.isPresent()) {
+            return new ResponseEntity<>(new Response("200", "Ok", post), HttpStatus.OK);
+        }
+        post.setId(id);
+        post.setUser(userDetailService.getCurrentUser());
+        post.setCommentId(currentPost.get().getCommentId());
+        post.setCommentList(currentPost.get().getCommentList());
+        post.setLikeList(currentPost.get().getLikeList());
+        post.setCreated_date(currentPost.get().getCreated_date());
+        if (post.getContent() == null || post.getContent().trim().equals("")) {
+            post.setContent(currentPost.get().getContent());
+        }
+        if (post.getStatus() == null || post.getStatus().trim().equals("")) {
+            post.setStatus(currentPost.get().getStatus());
+        }
+        if (post.getImageUrl() == null) {
+            post.setImageUrl(currentPost.get().getImageUrl());
+        }
+
+        postService.save(post);
+        return new ResponseEntity<>(new Response("200", "Ok", post), HttpStatus.OK);
     }
 
     //xóa bài post
@@ -117,7 +140,6 @@ public class UserController {
         Like like = likeService.findByPostsIdAndUserId(idPost, user.getId());
         if (like != null) {
             likeService.remove(like.getId());
-//            notificationService.remove(notificationService.findByLike(like).getId());
             return new ResponseEntity<>(HttpStatus.OK);
         } else {
             Post post = postService.findById(idPost).get();
@@ -125,10 +147,6 @@ public class UserController {
             like1.setUser(user);
             like1.setPosts(post);
             likeService.saves(like1);
-//            Notification notification = new Notification();
-//            notification.setNotify(notification.getLike().getUser().getFullName() +" đã like bài viết");
-//            notification.setLike(like1);
-//            notificationService.saves(notification);
             return new ResponseEntity<>(like1, HttpStatus.OK);
         }
     }
@@ -144,7 +162,7 @@ public class UserController {
     //showlike theo post
     @GetMapping("/listlike/{id}")
     public ResponseEntity<Iterable<Like>> getlistlikePost(@PathVariable Long id) {
-        Iterable<Like> lists =  likeService.findAllLikeByPosts_Id(id);
+        Iterable<Like> lists = likeService.findAllLikeByPosts_Id(id);
         return new ResponseEntity<>(lists, HttpStatus.OK);
     }
 
@@ -293,7 +311,7 @@ public class UserController {
 
     // danh sách lời kết bạn đã gửi
     @GetMapping("/showFriendRequest")
-    public ResponseEntity<List<User>> getFriendResquest(){
+    public ResponseEntity<List<User>> getFriendResquest() {
         User user = userDetailService.getCurrentUser();
         List<Friend> list = friendService.findFriendRequest(user, false);
         List<User> userList = new ArrayList<>();
@@ -329,7 +347,7 @@ public class UserController {
     }
 
     @GetMapping("/showPostNotification/{id}")
-    public ResponseEntity<Post> showPostNotification(@PathVariable Long id){
+    public ResponseEntity<Post> showPostNotification(@PathVariable Long id) {
         Post post = postService.findById(id).get();
         return new ResponseEntity<>(post, HttpStatus.OK);
     }

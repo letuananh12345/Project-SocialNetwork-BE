@@ -88,4 +88,10 @@ public class UserService implements IUserService {
     public Page<User> findAll(Pageable pageable) {
         return userRepository.findAll(pageable);
     }
+
+    @Override
+    public Iterable<User> findAllByOrderByIdDesc() {
+        return userRepository.findAllByOrderByIdDesc();
+    }
+
 }

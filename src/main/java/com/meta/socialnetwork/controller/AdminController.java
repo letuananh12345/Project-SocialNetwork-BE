@@ -2,6 +2,7 @@ package com.meta.socialnetwork.controller;
 
 import com.meta.socialnetwork.dto.request.*;
 import com.meta.socialnetwork.dto.response.JwtResponse;
+import com.meta.socialnetwork.dto.response.Response;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
 import com.meta.socialnetwork.model.Post;
 import com.meta.socialnetwork.model.Role;
@@ -9,6 +10,7 @@ import com.meta.socialnetwork.model.RoleName;
 import com.meta.socialnetwork.model.User;
 import com.meta.socialnetwork.security.jwt.JwtAuthTokenFilter;
 import com.meta.socialnetwork.security.jwt.JwtProvider;
+import com.meta.socialnetwork.security.userPrinciple.UserDetailServiceImpl;
 import com.meta.socialnetwork.security.userPrinciple.UserPrinciple;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.role.IRoleService;
@@ -32,7 +34,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 
@@ -43,6 +47,8 @@ public class AdminController {
 
     @Autowired
     IUserService userService;
+    @Autowired
+    UserDetailServiceImpl userDetailService;
     @Autowired
     PasswordEncoder passwordEncoder;
     @Autowired
@@ -58,13 +64,40 @@ public class AdminController {
 
 
     @GetMapping("/page-user")
-    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC)Pageable pageable){
+    public ResponseEntity<?> pageUser(@PageableDefault(sort = "username", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<User> userPage = userService.findAll(pageable);
-        if(userPage.isEmpty()){
+        if (userPage.isEmpty()) {
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
         return new ResponseEntity<>(userPage, HttpStatus.OK);
     }
+
+//    @GetMapping("/page-user1")
+//    public ResponseEntity<?> pageUser1(@PageableDefault(sort = "id", direction = Sort.Direction.DESC, size = 2) Pageable pageable) {
+//        Page<User> userPage = userService.findAll(pageable);
+//        if (userPage.isEmpty()) {
+//            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+//        }
+//        return new ResponseEntity<>(userPage, HttpStatus.OK);
+//    }
+
+
+    // api lấy gọi ý kết bạn
+    @GetMapping("/page-user2")
+    public ResponseEntity<?> pageUser2() {
+        List<User> userPage = (List<User>) userService.findAllByOrderByIdDesc();
+        List<User> list = new ArrayList<>();
+        for (int i = 0; i < userPage.size(); i++) {
+            if (userPage.get(i).getId() != userDetailService.getCurrentUser().getId()) {
+                list.add(userPage.get(i));
+                if (list.size() == 3) {
+                    return new ResponseEntity<>(list, HttpStatus.OK);
+                }
+            }
+        }
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
 
     @PostMapping("/signin")
     public ResponseEntity<?> login(@RequestBody SignInForm signInForm) {
@@ -124,16 +157,16 @@ public class AdminController {
     }
 
     @PutMapping("/block/{id}")
-    ResponseEntity<?> bock(@PathVariable Long id) {
+    ResponseEntity<Response> bock(@PathVariable Long id) {
         User user = userService.findById(id).get();
-            if(user.getIsActive()) {
-                user.setIsActive(false);
-                userService.save(user);
-                return new ResponseEntity<>("blocked", HttpStatus.OK);
-            }
-                user.setIsActive(true);
-                userService.save(user);
-                return new ResponseEntity<>("unblock", HttpStatus.OK);
+        if (user.getIsActive()) {
+            user.setIsActive(false);
+            userService.save(user);
+            return new ResponseEntity<>(new Response("200", "block", user), HttpStatus.OK);
+        }
+        user.setIsActive(true);
+        userService.save(user);
+        return new ResponseEntity<>(new Response("200", "unblock", user), HttpStatus.OK);
 
     }
 
