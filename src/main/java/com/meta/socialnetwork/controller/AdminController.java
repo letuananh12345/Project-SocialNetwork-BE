@@ -80,8 +80,6 @@ public class AdminController {
 //        }
 //        return new ResponseEntity<>(userPage, HttpStatus.OK);
 //    }
-
-
     // api lấy gọi ý kết bạn
     @GetMapping("/page-user2")
     public ResponseEntity<?> pageUser2() {
@@ -239,4 +237,5 @@ public class AdminController {
         }
     }
 }
+
 //fix error
