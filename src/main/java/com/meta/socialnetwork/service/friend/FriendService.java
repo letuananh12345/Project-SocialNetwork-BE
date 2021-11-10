@@ -59,8 +59,9 @@ public class FriendService implements IFriendService{
     }
 
     @Override
-    public Friend suggestion(User user, User friend, User user1, User friend1) {
-        return friendRepo.suggestion(user, friend, user1, friend1);
+    public Friend suggestion(User user, User friend, Boolean status1, User user1, User friend1, Boolean status) {
+        return friendRepo.suggestion(user, friend, status1, user1, friend1, status);
     }
+
 
 }
