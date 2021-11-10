@@ -52,6 +52,16 @@ public class UserController {
         return new ResponseEntity<>(chat, HttpStatus.OK);
     }
 
+    @GetMapping("showMess/{count}")
+    public ResponseEntity<List<Chat>> showChat(@PathVariable Long count){
+        List<Chat> chats = (List<Chat>) chatService.findAll();
+        List<Chat> list = new ArrayList<>();
+        for (int i = chats.size()-1; i>= chats.size()-count; i --){
+            list.add(chats.get(i));
+        }
+        return  new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
     // timeline
     @GetMapping("/showPost")
     public ResponseEntity<?> getListPost() {
@@ -213,8 +223,11 @@ public class UserController {
     // xóa comment
     @DeleteMapping("/deletecomment/{id}")
     public ResponseEntity<Response> deleteComment(@PathVariable("id") Long id) {
-        commentService.remove(id);
-        return new ResponseEntity<>(new Response("200", "deleted", "ok"), HttpStatus.OK);
+        User user = userDetailService.getCurrentUser();
+        if (commentService.findById(id).get().getUser() == user) {
+            commentService.remove(id);
+            return new ResponseEntity<>(new Response("200", "deleted", "ok"), HttpStatus.OK);
+        } else return new ResponseEntity<>(new Response("101","not comment","ok" ),HttpStatus.OK);
     }
 
     // tìm kiếm bạn theo tên
