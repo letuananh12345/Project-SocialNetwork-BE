@@ -4,6 +4,7 @@ import com.meta.socialnetwork.dto.response.Response;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
 import com.meta.socialnetwork.model.*;
 import com.meta.socialnetwork.security.userPrinciple.UserDetailServiceImpl;
+import com.meta.socialnetwork.service.IChatService;
 import com.meta.socialnetwork.service.comment.ICommentService;
 import com.meta.socialnetwork.service.friend.IFriendService;
 import com.meta.socialnetwork.service.like.ILikeService;
@@ -41,6 +42,15 @@ public class UserController {
     UserDetailServiceImpl userDetailService;
     @Autowired
     INotificationService notificationService;
+    @Autowired
+    IChatService chatService;
+
+    @GetMapping("/getMess")
+    public ResponseEntity<?> getMess(){
+        List<Chat> list = (List<Chat>) chatService.findAll();
+        Chat chat = chatService.findById(list.get(list.size()-1).getId()).get();
+        return new ResponseEntity<>(chat, HttpStatus.OK);
+    }
 
     // timeline
     @GetMapping("/showPost")

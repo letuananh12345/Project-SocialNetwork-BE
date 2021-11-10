@@ -90,8 +90,9 @@ public class AdminController {
         List<User> list = new ArrayList<>();
         for (int i = 0; i < userPage.size(); i++) {
             if (userPage.get(i).getId() != userDetailService.getCurrentUser().getId()) {
-                Friend friend = friendService.suggestion(user,userPage.get(i),userPage.get(i), user);
-                if(friend == null) {
+                Friend friend = friendService.suggestion(user, userPage.get(i),true, user, userPage.get(i), true );
+                Friend friend1 = friendService.suggestion(user, userPage.get(i),false, user, userPage.get(i), false );
+                if(friend == null && friend1 == null) {
                     list.add(userPage.get(i));
                     if (list.size() == 3) {
                         return new ResponseEntity<>(list, HttpStatus.OK);
