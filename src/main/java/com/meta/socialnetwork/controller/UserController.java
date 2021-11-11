@@ -62,7 +62,7 @@ public class UserController {
     }
 
     // timeline
-    @GetMapping("/showPost")
+    @GetMapping("/show")
     public ResponseEntity<?> getListPost() {
 //        List<Post> postPage =  postService.findAllByOrderByIdDesc();
         List<Post> postList = (List<Post>) postService.findAll();
