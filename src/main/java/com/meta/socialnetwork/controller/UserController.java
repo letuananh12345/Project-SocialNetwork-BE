@@ -66,16 +66,16 @@ public class UserController {
     public ResponseEntity<?> getListPost() {
 //        List<Post> postPage =  postService.findAllByOrderByIdDesc();
         List<Post> postList = (List<Post>) postService.findAll();
-        List<Post> newPost = new ArrayList<>();
-        for (int i = 0; i < postList.size(); i++) {
-            if (postList.get(i).getStatus().equals("public") || postList.get(i).getStatus().equals("friend")) {
-                newPost.add(postList.get(i));
-                if (newPost.size() == 12) {
-                    return new ResponseEntity<>(newPost, HttpStatus.OK);
-                }
-            }
-        }
-        return new ResponseEntity<>(newPost, HttpStatus.OK);
+//        List<Post> newPost = new ArrayList<>();
+//        for (int i = 0; i < 5; i++) {
+//            if (postList.get(i).getStatus().equals("public") || postList.get(i).getStatus().equals("friend")) {
+//                newPost.add(postList.get(i));
+//                if (newPost.size() == 12) {
+//                    return new ResponseEntity<>(newPost, HttpStatus.OK);
+//                }
+//            }
+//        }
+        return new ResponseEntity<>(postList, HttpStatus.OK);
     }
 
     @GetMapping("/showPostProfile")
