@@ -3,6 +3,7 @@ package com.meta.socialnetwork.controller;
 import com.meta.socialnetwork.dto.response.Response;
 import com.meta.socialnetwork.dto.response.ResponseMessage;
 import com.meta.socialnetwork.model.*;
+import com.meta.socialnetwork.security.jwt.JwtAuthTokenFilter;
 import com.meta.socialnetwork.security.userPrinciple.UserDetailServiceImpl;
 import com.meta.socialnetwork.service.Chat.IChatService;
 import com.meta.socialnetwork.service.comment.ICommentService;
@@ -11,6 +12,8 @@ import com.meta.socialnetwork.service.like.ILikeService;
 import com.meta.socialnetwork.service.notification.INotificationService;
 import com.meta.socialnetwork.service.post.IPostService;
 import com.meta.socialnetwork.service.user.IUserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +28,7 @@ import java.util.Optional;
 @RestController
 @CrossOrigin(origins = "*")
 public class UserController {
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserController.class);
     @Autowired
     IPostService postService;
     @Autowired
@@ -65,7 +69,9 @@ public class UserController {
     @GetMapping("/show")
     public ResponseEntity<?> getListPost() {
 //        List<Post> postPage =  postService.findAllByOrderByIdDesc();
+        LOGGER.info("Goi ham Show");
         List<Post> postList = (List<Post>) postService.findAll();
+        LOGGER.info("postList.size === "+postList.size());
 //        List<Post> newPost = new ArrayList<>();
 //        for (int i = 0; i < 5; i++) {
 //            if (postList.get(i).getStatus().equals("public") || postList.get(i).getStatus().equals("friend")) {
