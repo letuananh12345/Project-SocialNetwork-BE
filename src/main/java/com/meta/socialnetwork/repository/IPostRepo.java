@@ -14,7 +14,7 @@ public interface IPostRepo extends JpaRepository<Post, Long> {
     @Query("select p from Post p where p.user.id=?1 and p.status=?2 or p.status=?3")
     List<Post> findPostsByStatus(Long id, String status, String status1);
 
-    Iterable<Post> findAllByOrderByIdDesc();
+    List<Post> findAllByOrderByIdDesc();
 
     Iterable<Post> findByStatusOrderByIdDesc(String status);
 }

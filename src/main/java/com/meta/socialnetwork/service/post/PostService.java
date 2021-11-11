@@ -49,8 +49,8 @@ public class PostService implements IPostService{
     }
 
     @Override
-    public Iterable<Post> findAllByOrderByIdDesc() {
-        Iterable<Post> posts = postRepo.findAllByOrderByIdDesc();
+    public List<Post> findAllByOrderByIdDesc() {
+        List<Post> posts = postRepo.findAllByOrderByIdDesc();
         return posts;
     }
 

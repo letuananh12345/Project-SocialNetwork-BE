@@ -12,7 +12,7 @@ public interface IPostService extends IService<Post> {
 
     List<Post> findPostsByStatus(Long id, String status, String status1);
 
-    Iterable<Post> findAllByOrderByIdDesc();
+    List<Post> findAllByOrderByIdDesc();
 
     Iterable<Post> findByStatusOrderByIdDesc(String status);
 }

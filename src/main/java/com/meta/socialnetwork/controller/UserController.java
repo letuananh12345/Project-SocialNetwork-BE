@@ -64,11 +64,12 @@ public class UserController {
     // timeline
     @GetMapping("/showPost")
     public ResponseEntity<?> getListPost() {
-        List<Post> postPage = (List<Post>) postService.findAllByOrderByIdDesc();
+//        List<Post> postPage =  postService.findAllByOrderByIdDesc();
+        List<Post> postList = (List<Post>) postService.findAll();
         List<Post> newPost = new ArrayList<>();
-        for (int i = 0; i < postPage.size(); i++) {
-            if (postPage.get(i).getStatus().equals("public") || postPage.get(i).getStatus().equals("friend")) {
-                newPost.add(postPage.get(i));
+        for (int i = 0; i < postList.size(); i++) {
+            if (postList.get(i).getStatus().equals("public") || postList.get(i).getStatus().equals("friend")) {
+                newPost.add(postList.get(i));
                 if (newPost.size() == 12) {
                     return new ResponseEntity<>(newPost, HttpStatus.OK);
                 }
