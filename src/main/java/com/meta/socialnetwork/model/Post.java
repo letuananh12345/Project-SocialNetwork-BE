@@ -37,10 +37,10 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "post")
     private List<Comment> commentList = null;
-
+    @JsonIgnore
     @OneToMany(fetch = FetchType.LAZY,mappedBy = "posts")
     private List<Like> likeList = null;
 
