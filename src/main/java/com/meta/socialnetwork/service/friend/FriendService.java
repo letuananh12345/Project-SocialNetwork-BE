@@ -44,11 +44,6 @@ public class FriendService implements IFriendService{
     }
 
     @Override
-    public Boolean isFriend(User account, User friend1, Boolean status1, User user, User friend, Boolean status2) {
-        return friendRepo.isFriend(account, friend1, status1, user, friend, status2);
-    }
-
-    @Override
     public List<Friend> findFriendAdd(User user, Boolean status) {
         return friendRepo.findFriendAdd(user, status);
     }
@@ -60,7 +55,7 @@ public class FriendService implements IFriendService{
 
     @Override
     public Friend suggestion(User user, User friend, Boolean status1, User user1, User friend1, Boolean status) {
-        return friendRepo.suggestion(user, friend, status1, user1, friend1, status);
+        return friendRepo.suggestion(user, friend,status1, user1,  friend1, status);
     }
 
 

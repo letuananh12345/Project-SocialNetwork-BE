@@ -15,17 +15,16 @@ public class Chat {
     private String name;
     private String message;
     private int img;
-//
 
     public Chat() {
     }
 
-    public Long getId() {
-        return id;
+    public Integer getImg() {
+        return img;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setImg(Integer img) {
+        this.img = img;
     }
 
     public String getName() {
@@ -43,19 +42,23 @@ public class Chat {
     public void setMessage(String message) {
         this.message = message;
     }
-
-    public int getImg() {
-        return img;
-    }
-
-    public void setImg(int img) {
-        this.img = img;
-    }
-    //    @ManyToOne
+    //    private Boolean status;
+//    private TimeZone time_send;
+//
+//    @ManyToOne
 //    @JoinColumn(name = "user_id")
 //    private User user_send;
 //
 //    @ManyToOne
 //    @JoinColumn(name = "users_id")
 //    private User user_receive;
+
+    @Override
+    public String toString() {
+        return "Chat{" +
+                "name='" + name + '\'' +
+                ", message='" + message + '\'' +
+                ", img='" + img + '\'' +
+                '}';
+    }
 }

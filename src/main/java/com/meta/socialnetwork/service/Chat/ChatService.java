@@ -10,23 +10,24 @@ import java.util.Optional;
 public class ChatService  implements IChatService{
     @Autowired
     IChatRepo chatRepo;
+
     @Override
     public Chat saves(Chat chat) {
         return chatRepo.save(chat);
     }
 
     @Override
-    public Iterable findAll() {
+    public Iterable<Chat> findAll() {
         return chatRepo.findAll();
     }
 
     @Override
-    public Optional findById(Long id) {
+    public Optional<Chat> findById(Long id) {
         return chatRepo.findById(id);
     }
 
     @Override
-    public void save(Object o) {
+    public void save(Chat chat) {
 
     }
 

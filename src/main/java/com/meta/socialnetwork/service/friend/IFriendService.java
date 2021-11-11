@@ -12,11 +12,11 @@ public interface IFriendService extends IService<Friend> {
 
     List<Friend> findAllByIdAcc(User account, Boolean status1, User friend, Boolean status2);
 
-    Boolean isFriend(User account, User friend1, Boolean status1, User user, User friend, Boolean status2);
-
     List<Friend> findFriendAdd(User user, Boolean status);
 
     List<Friend> findFriendRequest(User user, Boolean status);
 
-    Friend suggestion(User user, User friend, Boolean status1, User user1, User friend1, Boolean status);
+    Friend suggestion(User user, User friend,Boolean status1, User user1, User friend1, Boolean status);
+
+
 }

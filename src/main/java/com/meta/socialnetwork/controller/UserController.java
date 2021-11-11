@@ -14,7 +14,6 @@ import com.meta.socialnetwork.service.user.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -42,6 +41,25 @@ public class UserController {
     UserDetailServiceImpl userDetailService;
     @Autowired
     INotificationService notificationService;
+    @Autowired
+    IChatService chatService;
+
+    @GetMapping("/getMess")
+    public ResponseEntity<?> getMess(){
+        List<Chat> list = (List<Chat>) chatService.findAll();
+        Chat chat = chatService.findById(list.get(list.size()-1).getId()).get();
+        return new ResponseEntity<>(chat, HttpStatus.OK);
+    }
+
+    @GetMapping("showMess/{count}")
+    public ResponseEntity<List<Chat>> showChat(@PathVariable Long count){
+        List<Chat> chats = (List<Chat>) chatService.findAll();
+        List<Chat> list = new ArrayList<>();
+        for (int i = chats.size()-1; i>= chats.size()-count; i --){
+            list.add(chats.get(i));
+        }
+        return  new ResponseEntity<>(list, HttpStatus.OK);
+    }
 
     // timeline
     @GetMapping("/showPost")
